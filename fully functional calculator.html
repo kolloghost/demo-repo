@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My First Magic Calculator</title>
+    <style>
+        /* This part is just dress-up for our calculator! */
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f0f0f0;
+            margin: 0;
+        }
+        .calculator {
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+        }
+        input[type="text"] {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 10px;
+            border: none;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        input[type="button"] {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- This is the main body of our calculator -->
+    <div class="calculator">
+        <!-- 1. The Screen (Where numbers show up) -->
+        <input type="text" id="screen" readonly>
+        <br>
+        
+        <!-- 2. The Buttons (Rows of numbers and math actions) -->
+        <input type="button" value="7" class="btn">
+        <input type="button" value="8" class="btn">
+        <input type="button" value="9" class="btn">
+        <input type="button" value="/" class="btn operator">
+        <br>
+        <input type="button" value="4" class="btn">
+        <input type="button" value="5" class="btn">
+        <input type="button" value="6" class="btn">
+        <input type="button" value="*" class="btn operator">
+        <br>
+        <input type="button" value="1" class="btn">
+        <input type="button" value="2" class="btn">
+        <input type="button" value="3" class="btn">
+        <input type="button" value="-" class="btn operator">
+        <br>
+        <input type="button" value="C" id="clear">
+        <input type="button" value="0" class="btn">
+        <input type="button" value="=" id="equal">
+        <input type="button" value="+" class="btn operator">
+    </div>
+
+    <!-- 3. The Magic Logic (JavaScript) -->
+    <script>
+        const screen = document.getElementById('screen');
+        const buttons = document.querySelectorAll('.btn');
+        const clearButton = document.getElementById('clear');
+        const equalButton = document.getElementById('equal');
+
+        // Add character to screen when number/operator buttons are clicked
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                screen.value += button.value;
+            });
+        });
+
+        // Clear the screen when 'C' is clicked
+        clearButton.addEventListener('click', () => {
+            screen.value = '';
+        });
+
+        // Safe calculation logic when '=' is clicked
+        equalButton.addEventListener('click', () => {
+            try {
+                // Using Function() constructor instead of eval() for better performance and safety
+                if (screen.value.trim() !== "") {
+                    screen.value = new Function(`return ${screen.value}`)();
+                }
+            } catch (error) {
+                screen.value = 'Error'; // Catching bad equations like '5++2' or '8/'
+            }
+        });
+    </script>
+</body>
+</html>
