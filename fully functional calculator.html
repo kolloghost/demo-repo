@@ -1,103 +1,305 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My First Magic Calculator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Pro Calculator</title>
     <style>
-        /* This part is just dress-up for our calculator! */
+        :root {
+            --bg-color: #f4f6f9;
+            --calc-bg: #1e222b;
+            --screen-bg: #0f1115;
+            --text-main: #ffffff;
+            --text-muted: #6c7a89;
+            --btn-num: #2c313c;
+            --btn-num-hover: #3e4452;
+            --btn-op: #ff9f0a;
+            --btn-op-hover: #f08c00;
+            --btn-util: #4e5666;
+            --btn-util-hover: #636d81;
+        }
+
         body {
-            font-family: sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background: #f0f0f0;
+            min-height: 100vh;
+            background: var(--bg-color);
             margin: 0;
         }
-        .calculator {
-            background: #333;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
-        }
-        input[type="text"] {
+
+        .calculator-container {
+            display: flex;
+            gap: 20px;
+            background: var(--calc-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0px 15px 35px rgba(0,0,0,0.25);
+            max-width: 600px;
             width: 100%;
-            height: 50px;
-            font-size: 24px;
-            text-align: right;
-            margin-bottom: 10px;
-            border: none;
-            padding: 5px;
             box-sizing: border-box;
         }
-        input[type="button"] {
-            width: 50px;
+
+        .calculator {
+            flex: 1;
+        }
+
+        .screen-container {
+            background: var(--screen-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        #history-display {
+            font-size: 14px;
+            color: var(--text-muted);
+            min-height: 20px;
+            word-wrap: break-word;
+            margin-bottom: 5px;
+        }
+
+        #screen {
+            width: 100%;
             height: 50px;
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-main);
+            background: transparent;
+            border: none;
+            text-align: right;
+            outline: none;
+            padding: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            height: 60px;
             font-size: 20px;
-            margin: 5px;
+            font-weight: 500;
+            border: none;
+            border-radius: 12px;
             cursor: pointer;
+            color: var(--text-main);
+            transition: background 0.15s ease, transform 0.05s ease;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-number { background: var(--btn-num); }
+        .btn-number:hover { background: var(--btn-num-hover); }
+
+        .btn-operator { background: var(--btn-op); }
+        .btn-operator:hover { background: var(--btn-op-hover); }
+
+        .btn-utility { background: var(--btn-util); }
+        .btn-utility:hover { background: var(--btn-util-hover); }
+
+        .double-width { grid-column: span 2; }
+
+        /* Sidebar History Panel */
+        .history-panel {
+            width: 180px;
+            border-left: 1px solid #3a3f4d;
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-main);
+        }
+
+        .history-panel h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        #history-log {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 300px;
+            font-size: 13px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #history-log li {
+            padding: 6px 0;
+            border-bottom: 1px solid #2c313c;
+            cursor: pointer;
+            color: #b0b7c3;
+        }
+
+        #history-log li:hover {
+            color: var(--text-main);
+        }
+
+        @media (max-width: 500px) {
+            .calculator-container { flex-direction: column; }
+            .history-panel { width: 100%; border-left: none; border-top: 1px solid #3a3f4d; padding-left: 0; padding-top: 15px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- This is the main body of our calculator -->
-    <div class="calculator">
-        <!-- 1. The Screen (Where numbers show up) -->
-        <input type="text" id="screen" readonly>
-        <br>
-        
-        <!-- 2. The Buttons (Rows of numbers and math actions) -->
-        <input type="button" value="7" class="btn">
-        <input type="button" value="8" class="btn">
-        <input type="button" value="9" class="btn">
-        <input type="button" value="/" class="btn operator">
-        <br>
-        <input type="button" value="4" class="btn">
-        <input type="button" value="5" class="btn">
-        <input type="button" value="6" class="btn">
-        <input type="button" value="*" class="btn operator">
-        <br>
-        <input type="button" value="1" class="btn">
-        <input type="button" value="2" class="btn">
-        <input type="button" value="3" class="btn">
-        <input type="button" value="-" class="btn operator">
-        <br>
-        <input type="button" value="C" id="clear">
-        <input type="button" value="0" class="btn">
-        <input type="button" value="=" id="equal">
-        <input type="button" value="+" class="btn operator">
+    <div class="calculator-container">
+        <!-- Main Calculator UI -->
+        <div class="calculator">
+            <div class="screen-container">
+                <div id="history-display"></div>
+                <input type="text" id="screen" value="0" readonly>
+            </div>
+            
+            <div class="grid">
+                <button class="btn-utility" data-action="clear">C</button>
+                <button class="btn-utility" data-action="backspace">⌫</button>
+                <button class="btn-utility" data-action="percentage">%</button>
+                <button class="btn-operator" data-val="/">÷</button>
+
+                <button class="btn-number" data-val="7">7</button>
+                <button class="btn-number" data-val="8">8</button>
+                <button class="btn-number" data-val="9">9</button>
+                <button class="btn-operator" data-val="*">×</button>
+
+                <button class="btn-number" data-val="4">4</button>
+                <button class="btn-number" data-val="5">5</button>
+                <button class="btn-number" data-val="6">6</button>
+                <button class="btn-operator" data-val="-">−</button>
+
+                <button class="btn-number" data-val="1">1</button>
+                <button class="btn-number" data-val="2">2</button>
+                <button class="btn-number" data-val="3">3</button>
+                <button class="btn-operator" data-val="+">+</button>
+
+                <button class="btn-number double-width" data-val="0">0</button>
+                <button class="btn-number" data-val=".">.</button>
+                <button class="btn-operator" id="calculate">=</button>
+            </div>
+        </div>
+
+        <!-- Sidebar Log Panel -->
+        <div class="history-panel">
+            <h3>History Log</h3>
+            <ul id="history-log"></ul>
+        </div>
     </div>
 
-    <!-- 3. The Magic Logic (JavaScript) -->
+    <!-- Advanced Production JavaScript Logic -->
     <script>
+        // State Management object to store data cleanly
+        const state = {
+            currentInput: '0',
+            previousInput: '',
+            operator: null,
+            shouldResetScreen: false,
+            logs: []
+        };
+
+        // DOM elements cache
         const screen = document.getElementById('screen');
-        const buttons = document.querySelectorAll('.btn');
-        const clearButton = document.getElementById('clear');
-        const equalButton = document.getElementById('equal');
+        const historyDisplay = document.getElementById('history-display');
+        const historyLog = document.getElementById('history-log');
 
-        // Add character to screen when number/operator buttons are clicked
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                screen.value += button.value;
-            });
-        });
-
-        // Clear the screen when 'C' is clicked
-        clearButton.addEventListener('click', () => {
-            screen.value = '';
-        });
-
-        // Safe calculation logic when '=' is clicked
-        equalButton.addEventListener('click', () => {
-            try {
-                // Using Function() constructor instead of eval() for better performance and safety
-                if (screen.value.trim() !== "") {
-                    screen.value = new Function(`return ${screen.value}`)();
-                }
-            } catch (error) {
-                screen.value = 'Error'; // Catching bad equations like '5++2' or '8/'
+        // Main entry pointer for data processing
+        function handleNumber(number) {
+            if (state.shouldResetScreen) {
+                state.currentInput = '';
+                state.shouldResetScreen = false;
             }
-        });
-    </script>
-</body>
-</html>
+            
+            // Prevent entering multiple decimals
+            if (number === '.' && state.currentInput.includes('.')) return;
+            
+            // Overwrite default zero unless adding a decimal point
+            if (state.currentInput === '0' && number !== '.') {
+                state.currentInput = number;
+            } else {
+                state.currentInput += number;
+            }
+            updateUI();
+        }
+
+        function handleOperator(nextOperator) {
+            const parsedCurrent = parseFloat(state.currentInput);
+
+            // Permit runtime transition between operators if clicked back-to-back
+            if (state.operator && state.shouldResetScreen) {
+                state.operator = nextOperator;
+                state.previousInput = state.previousInput.slice(0, -2) + ` ${nextOperator}`;
+                updateUI(true);
+                return;
+            }
+
+            if (state.previousInput === '') {
+                state.previousInput = `${state.currentInput} ${nextOperator}`;
+            } else if (state.operator) {
+                // Execute interim calculations for chained operations (e.g. 5 + 5 + 5)
+                const result = executeCalculation();
+                state.previousInput = `${result} ${nextOperator}`;
+                state.currentInput = String(result);
+            }
+
+            state.shouldResetScreen = true;
+            state.operator = nextOperator;
+            updateUI(true);
+        }
+
+        function executeCalculation() {
+            let result = 0;
+            const prev = parseFloat(state.previousInput);
+            const current = parseFloat(state.currentInput);
+
+            if (isNaN(prev) || isNaN(current)) return current;
+
+            switch (state.operator) {
+                case '+': result = prev + current; break;
+                case '-': result = prev - current; break;
+                case '*': result = prev * current; break;
+                case '/': 
+                    if (current === 0) {
+                        return "Error: Div by 0";
+                    }
+                    result = prev / current; 
+                    break;
+                default: return current;
+            }
+
+            // Fix precision issues inherent to JavaScript Floating Points (e.g., 0.1 + 0.2)
+            return parseFloat(result.toFixed(10));
+        }
+
+        function performEvaluation() {
+            if (!state.operator || state.shouldResetScreen) return;
+
+            const expr = `${state.previousInput} ${state.currentInput}`;
+            const result = String(executeCalculation());
+            
+            if (result.includes("Error")) {
+                state.currentInput = result;
+                state.previousInput = '';
+                state.operator = null;
+                updateUI();
+                return;
+            }
+
+            // Append transaction to history logs
+            const logEntry = `${expr} = ${result}`;
+            state.logs.unshift(logEntry);
+            renderLogs();
+
+            state.currentInput = result;
+            state.previousInput = '';
+            state.operator = null;
+            state.shouldResetScreen = true;
+            updateUI();
+        }
+
