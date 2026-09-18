@@ -106,7 +106,6 @@
 
         .double-width { grid-column: span 2; }
 
-        /* Sidebar History Panel */
         .history-panel {
             width: 180px;
             border-left: 1px solid #3a3f4d;
@@ -152,7 +151,6 @@
 <body>
 
     <div class="calculator-container">
-        <!-- Main Calculator UI -->
         <div class="calculator">
             <div class="screen-container">
                 <div id="history-display"></div>
@@ -186,16 +184,13 @@
             </div>
         </div>
 
-        <!-- Sidebar Log Panel -->
         <div class="history-panel">
             <h3>History Log</h3>
             <ul id="history-log"></ul>
         </div>
     </div>
 
-    <!-- Advanced Production JavaScript Logic -->
     <script>
-        // State Management object to store data cleanly
         const state = {
             currentInput: '0',
             previousInput: '',
@@ -204,22 +199,18 @@
             logs: []
         };
 
-        // DOM elements cache
         const screen = document.getElementById('screen');
         const historyDisplay = document.getElementById('history-display');
         const historyLog = document.getElementById('history-log');
 
-        // Main entry pointer for data processing
         function handleNumber(number) {
             if (state.shouldResetScreen) {
                 state.currentInput = '';
                 state.shouldResetScreen = false;
             }
             
-            // Prevent entering multiple decimals
             if (number === '.' && state.currentInput.includes('.')) return;
             
-            // Overwrite default zero unless adding a decimal point
             if (state.currentInput === '0' && number !== '.') {
                 state.currentInput = number;
             } else {
@@ -229,9 +220,6 @@
         }
 
         function handleOperator(nextOperator) {
-            const parsedCurrent = parseFloat(state.currentInput);
-
-            // Permit runtime transition between operators if clicked back-to-back
             if (state.operator && state.shouldResetScreen) {
                 state.operator = nextOperator;
                 state.previousInput = state.previousInput.slice(0, -2) + ` ${nextOperator}`;
@@ -242,7 +230,6 @@
             if (state.previousInput === '') {
                 state.previousInput = `${state.currentInput} ${nextOperator}`;
             } else if (state.operator) {
-                // Execute interim calculations for chained operations (e.g. 5 + 5 + 5)
                 const result = executeCalculation();
                 state.previousInput = `${result} ${nextOperator}`;
                 state.currentInput = String(result);
@@ -250,7 +237,7 @@
 
             state.shouldResetScreen = true;
             state.operator = nextOperator;
-            updateUI(true);
+            updateUI();
         }
 
         function executeCalculation() {
@@ -265,15 +252,12 @@
                 case '-': result = prev - current; break;
                 case '*': result = prev * current; break;
                 case '/': 
-                    if (current === 0) {
-                        return "Error: Div by 0";
-                    }
+                    if (current === 0) return "Error: Div by 0";
                     result = prev / current; 
                     break;
                 default: return current;
             }
 
-            // Fix precision issues inherent to JavaScript Floating Points (e.g., 0.1 + 0.2)
             return parseFloat(result.toFixed(10));
         }
 
@@ -291,7 +275,6 @@
                 return;
             }
 
-            // Append transaction to history logs
             const logEntry = `${expr} = ${result}`;
             state.logs.unshift(logEntry);
             renderLogs();
@@ -300,6 +283,26 @@
             state.previousInput = '';
             state.operator = null;
             state.shouldResetScreen = true;
+            updateUI();
+        }
+
+        function handleUtility(action) {
+            switch(action) {
+                case 'clear':
+                    state.currentInput = '0';
+                    state.previousInput = '';
+                    state.operator = null;
+                    state.shouldResetScreen = false;
+                    break;
+                case 'backspace':
+                    if (state.shouldResetScreen || state.currentInput.includes('Error')) return;
+                    state.currentInput = state.currentInput.slice(0, -1);
+                    if (state.currentInput === '' || state.currentInput === '-') state.currentInput = '0';
+                    break;
+                case 'percentage':
+                    state.currentInput = String(parseFloat(state.currentInput) / 100);
+                    break;
+            }
             updateUI();
         }
 
